@@ -1,64 +1,101 @@
-/*var data = '{"coo":[' +
-'{"lat":"41.283813","lng":-8.568663 },' +
-'{"lat":"41.283786","lng":-8.568360 },' +
-'{"lat":"41.283821","lng":"-8.569832" },' +
-'{"lat":"41.283780","lng":"-8.571136" },' +
-'{"lat":"41.283740","lng":"-8.573566" },' +
-'{"lat":"41.283745","lng":"-8.574929" },' +
-'{"lat":"41.284066","lng":"-8.578514" },' +
-'{"lat":"41.284066","lng":"-8.578514" },' +
-'{"lat":"41.284066","lng":"-8.578514" },' +
-'{"lat":"41.284066","lng":"-8.578514" },' +
-'{"lat":"41.283054","lng":"-8.580569" },' +
-'{"lat":"41.282873","lng":"-8.583361" }]}';*/
+/**
+ * Bus.js
+ */
 
-var data = '{"coo":[' +
-'{"lat":"41.2837096","lng":-8.567697 },' +
-'{"lat":"41.283745","lng":-8.567840 },' +
-'{"lat":"41.2837661","lng":-8.5679916 },' +
-'{"lat":"41.2837842","lng":-8.5681177 },' +
-'{"lat":"41.2837869","lng":-8.5682386 },' +
-'{"lat":"41.2837903","lng":-8.5683551},' +
-'{"lat":"41.2837913","lng":-8.5684625 },' +
-'{"lat":"41.2837913","lng":-8.5684625 },' +
-'{"lat":"41.2837913","lng":-8.5684625 },' +
-'{"lat":"41.283795","lng":"-8.568591" }]}';
+var map, marker, latLngMarker, index, heatmapData = [], totalDistance, heatmap;
 
-var obj = JSON.parse(data);
-
-var map, marker, latLngMarker, index, heatmapData = [], totalDistance;
+var coordinates = {
+	bus: [
+		{
+			lat: [41.2837096, 41.283745, 41.2837661, 41.2837842, 41.2837869, 41.2837903, 41.2837913, 41.2837913, 41.2837913, 41.283795],
+			lng: [-8.567697, -8.567840, -8.5679916, -8.5681177, -8.5682386, -8.5683551, -8.5684625, -8.5684625, -8.5684625, -8.568591],
+			stop: {
+				lat: [41.283795],
+				lng: [-8.568591]
+			}
+		},
+		{
+			lat: [],
+			lng: [],
+			stop: {
+				lat: [41.283795, 41.283745],
+				lng: [-8.568591, -8.567840]
+			}
+		},
+		{
+			lat: [],
+			lng: [],
+			stop: {
+				lat: [41.3795],
+				lng: [-8.568591]
+			}
+		},
+		
+	],
+	/* needed to handle all markers  and be able to delete */
+	markers: []
+};
 
 /* SETUP */
 window.onload = function () {
-	
-	/* SETUP MAP */
-	this.initMap();
 
-	/* EVENTS */
-	document.getElementById("startbtn").addEventListener("click", StartSimulation);	
+	/* As Default, the Bus is the 1 */
+	var busNumber = 0;
+
+	/* SETUP MAP */
+	this.initMap(busNumber);
+
+	/* EVENTS */	
+	document.getElementById("startbtn").addEventListener('click', function() {
+		StartSimulation( busNumber );
+		deleteHeatMap();
+	});
+
+	var selectBus = document.getElementById("busnumber");
+	selectBus.addEventListener("change", function() {
+		busNumber = selectBus.value;
+
+		/* Remove multiple Markers */
+		for(let i = 0; i < coordinates.markers.length; i++) {
+			coordinates.markers[i].setMap(null);
+		}
+
+		/* Add multiple Markers */
+		for (let i = 0; i < coordinates.bus[busNumber].stop.lat.length; i++) {
+			 
+			stopLatLng = new google.maps.LatLng(coordinates.bus[busNumber].stop.lat[i], coordinates.bus[busNumber].stop.lng[i]);
+
+			var marker = new google.maps.Marker({
+				position: stopLatLng,
+				map: map
+			});
+
+			/* Add to array 'markers' after adding marker */
+			coordinates.markers.push(marker);
+
+		 }
+	});	
 
 }	
 
-
-
-function StartSimulation(){
+function StartSimulation( busNumber ){
 
 	index = 0, totalDistance = 0;
 	
 	var inter = setInterval(function(){
 
-		latLngMarker = new google.maps.LatLng(obj.coo[index].lat,obj.coo[index].lng);
+		latLngMarker = new google.maps.LatLng(coordinates.bus[busNumber].lat[index],coordinates.bus[busNumber].lng[index]);
 
 		ChangesMarkerPos(latLngMarker);
 
 		/* Inserts in last position */
 		heatmapData.push(latLngMarker);
 
-		window.document.getElementById("lat-text").innerHTML = obj.coo[index].lat;
-		window.document.getElementById("lng-text").innerHTML = obj.coo[index].lng;
+		window.document.getElementById("lat-text").innerHTML = coordinates.bus[busNumber].lat[index];
+		window.document.getElementById("lng-text").innerHTML = coordinates.bus[busNumber].lng[index];
 
 		if (index > 0) {
-			var dist = distanceInMBetweenEarthCoordinates(obj.coo[index-1].lat, obj.coo[index-1].lng, obj.coo[index].lat, obj.coo[index].lng);
+			var dist = distanceInMBetweenEarthCoordinates(coordinates.bus[busNumber].lat[index-1], coordinates.bus[busNumber].lng[index-1], coordinates.bus[busNumber].lat[index], coordinates.bus[busNumber].lng[index]);
 			var vel = dist * 3.6;
 
 			if (vel == 0 && dist == 0) {
@@ -72,7 +109,7 @@ function StartSimulation(){
 		} 
 
 		/* +1 position, so -1 */
-		if (index == obj.coo.length-1) {
+		if (index == (coordinates.bus[busNumber].lat.length)-1) {
 
 			generatesHeatMap(heatmapData);
 			window.document.getElementById("totalDist").innerHTML = totalDistance.toFixed(2) + "(m)";
@@ -86,9 +123,9 @@ function StartSimulation(){
 	}, 1000);
 }
 
-function initMap() {
+function initMap( busNumber ) {
 
-	var MaplatLng = new google.maps.LatLng(obj.coo[0].lat,obj.coo[0].lng);
+	var MaplatLng = new google.maps.LatLng(coordinates.bus[busNumber].lat[0],coordinates.bus[busNumber].lng[0]);
 
 	map = new google.maps.Map(document.getElementById('map'), {
         center: MaplatLng,
@@ -106,11 +143,24 @@ function initMap() {
 function generatesHeatMap (heatmapData) {
 
 	/* generates heatMap */
-	var heatmap = new google.maps.visualization.HeatmapLayer({
+	heatmap = new google.maps.visualization.HeatmapLayer({
 		data: heatmapData
-	  });
+	});
 	heatmap.setMap(map);
 
+}
+
+function deleteHeatMap () {
+
+	/* If heatmap already exists: clears heatmap data */
+	if (typeof heatmap != "undefined") {
+		heatmap.setMap(null);
+	}
+
+}
+
+function clearMarkers() {
+	setMapOnAll(null);
 }
 
 function ChangesMarkerPos (latLngMarker) {
@@ -135,7 +185,7 @@ function distanceInMBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
 
 function degreesToRadians(degrees) {
 	return degrees * Math.PI / 180;
-  }
+}
 
 
 
