@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusMapLocal</title>
+
+    <!-- BootStrap library import --> 
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/index.css">
+
+    <script defer src="js/bus.js"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaK8XfI5ZK3_Ylc5WmzhxxcthaHwIrGIA&libraries=visualization"
+      async defer></script>
+
+</head>
+<body>
+
+    <div class="container-fluid">
+
+        <div class="container">
+
+            <br>
+            <h2>Very simple approach to Driving Delay</h2>
+            <br>
+
+            <div class="row">
+
+                <div class="col-8" id="map"></div>
+    
+                <div class="col simu">
+
+                    <div class="row justify-content-center">
+                        <select name="busnumber" id="busnumber">
+                            <option value="1">Bus1</option>
+                            <option value="2">Bus2</option>
+                            <option value="3">Bus3</option>
+                        </select>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <button class="btn btn-success" id="startbtn">Start Simulation</button>
+                    </div>
+                    
+                    <div class="row" id="lat">
+                        <div class="col">
+                            <p class="text-left"><strong>Latitude:</strong></p>
+                        </div>
+                        <div class="col">
+                            <p class="" id="lat-text"> </p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="lng">
+                        <div class="col">
+                            <p class="text-left"><strong>Longitude: </strong> </p>
+                        </div>
+                        <div class="col">
+                            <p class="text-left" id="lng-text"></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="distance">
+
+                        <div class="col">
+                            <p class="text-left"><strong>Distance: </strong></p>
+                        </div>
+                        <div class="col">
+                            <p class="text-left" id="distance-text"></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="velocity">
+
+                        <div class="col">
+                            <p class="text-left"><strong>Velocity: </strong></p>
+                        </div>
+                        <div class="col">
+                            <p class="text-left" id="velocity-text"></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="time_t">
+                        <div class="col">
+                            <p class="text-left"><strong>Time: </strong></p>
+                        </div>
+                        <div class="col">
+                            <p class="text-left" id="time_t-text"></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="totalDistance">
+                        <div class="col">
+                            <p class="text-left"><strong>Total Distance:</strong></p>
+                        </div>
+                        <div class="col">
+                            <p class="text-left" id="totalDist"></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="endSimu">
+                        <div class="col">
+                            <p class="text-center" id="endSimu-text"></p>
+                        </div>
+                    </div>
+
+    
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+    
+</body>
+</html>
