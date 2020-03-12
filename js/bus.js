@@ -2,7 +2,7 @@
  * Bus.js
  */
 
-var map, marker, latLngMarker, index, heatmapData = [], totalDistance, heatmap;
+var map, marker, latLngMarker, index, heatmapData = [], totalDistance, heatmap, PathObject;
 
 var coordinates = {
 	bus: [
@@ -15,8 +15,8 @@ var coordinates = {
 			}
 		},
 		{
-			lat: [],
-			lng: [],
+			lat: [41.2837096, 41.283683, 41.283653, 41.283616, , , , , , , , , , , ,],
+			lng: [-8.567697, 8.567548, 8.567350, 8.567181, , , , , , , , , , , ,],
 			stop: {
 				lat: [41.283795, 41.283745],
 				lng: [-8.568591, -8.567840]
@@ -200,40 +200,27 @@ function AddMultipleMarkers (busNumber) {
 
 function CreatePath( busNumber ) {
 
-	busPath = [
-		{
-			lat: [41.2837096],
-			lng: [-8.41]
-		}
-	];
+	var busPath = [];
 
 	for (let index = 0; index < coordinates.bus[busNumber].lat.length; index++) {
 
-		busPath.push(coordinates.bus[busNumber].lat[index], coordinates.bus[busNumber].lng[index]);
+		busPath.push({lat: coordinates.bus[busNumber].lat[index],lng: coordinates.bus[busNumber].lng[index]});
 		
 	}
-
-	console.log(busPath);
-
-	var flightPathCoordinates = [
-		{
-			lat: 37.772, 
-			lng: -122.214
-		},
-		{lat: 21.291, lng: -157.821},
-		{lat: -18.142, lng: 178.431},
-		{lat: -27.467, lng: 153.027}
-	  ];
 	
-	var LineObject = new google.maps.Polyline({
+	PathObject = new google.maps.Polyline({
 		path: busPath,
 		geodesic: true,
 		strokeColor: '#FF0000',
 		strokeOpacity: 1.0,
-		strokeWeight: 2
+		strokeWeight: 1
 	});
 
-	LineObject.setMap(map);
+	PathObject.setMap(map);
 
+}
+
+function DeletePath() {
+	PathObject.setMap(null);
 }
 
