@@ -15,11 +15,11 @@ var coordinates = {
 			}
 		},
 		{
-			lat: [41.2837096, 41.283683, 41.283653, 41.283616, , , , , , , , , , , ,],
-			lng: [-8.567697, 8.567548, 8.567350, 8.567181, , , , , , , , , , , ,],
+			lat: [41.2837096, 41.283683, 41.283653, 41.283616, 41.283588, 41.283550, 41.283497, 41.283497, 41.283497, 41.283467, 41.283435, 41.283393, 41.283346, 41.283302, 41.283262, 41.283215, 41.283171],
+			lng: [-8.567697, -8.567548, -8.567350, -8.567181, -8.567033, -8.566843, -8.566682, -8.566682, -8.566682, -8.566435, -8.566239, -8.566030, -8.565821, -8.565585, -8.565397, -8.565158, -8.564954],
 			stop: {
-				lat: [41.283795, 41.283745],
-				lng: [-8.568591, -8.567840]
+				lat: [41.283497],
+				lng: [-8.566682]
 			}
 		},
 		{
@@ -34,6 +34,7 @@ var coordinates = {
 	],
 	/* needed to handle all markers  and be able to delete */
 	markers: [],
+	path: []
 };
 
 /* SETUP */
@@ -41,13 +42,18 @@ window.onload = function () {
 
 	/* As Default, the Bus is the 1 */
 	var busNumber = 0;
+	var enableCenter = 0;
 
 	/* SETUP MAP */
 	this.initMap(busNumber);
 
 	/* EVENTS */	
+	document.getElementById("focus").addEventListener('click', function() {
+		enableCenter = 1;
+	});
+
 	document.getElementById("startbtn").addEventListener('click', function() {
-		StartSimulation( busNumber );
+		StartSimulation( busNumber, enableCenter);
 		deleteHeatMap();
 	});
 
@@ -61,20 +67,24 @@ window.onload = function () {
 		/* Add multiple Markers */
 		AddMultipleMarkers(busNumber);
 
+		RemovePath();
+
 		CreatePath(busNumber);
 	});	
 
 }	
 
-function StartSimulation( busNumber ){
+function StartSimulation( busNumber , enableCenter){
 
 	index = 0, totalDistance = 0;
+
+	CleanTextValues();
 	
 	var inter = setInterval(function(){
 
 		latLngMarker = new google.maps.LatLng(coordinates.bus[busNumber].lat[index],coordinates.bus[busNumber].lng[index]);
 
-		ChangesMarkerPos(latLngMarker);
+		ChangesMarkerPos(latLngMarker, enableCenter);
 
 		/* Inserts in last position */
 		heatmapData.push(latLngMarker);
@@ -151,9 +161,12 @@ function clearMarkers() {
 	setMapOnAll(null);
 }
 
-function ChangesMarkerPos (latLngMarker) {
+function ChangesMarkerPos (latLngMarker, enableCenter) {
 	marker.setPosition(latLngMarker);
-	map.setCenter(latLngMarker);
+
+	console.log(enableCenter);
+	if (enableCenter)
+		map.setCenter(latLngMarker);
 }
 
 function distanceInMBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
@@ -178,10 +191,12 @@ function degreesToRadians(degrees) {
 function RemoveMarkers() {
 	for(let i = 0; i < coordinates.markers.length; i++) {
 		coordinates.markers[i].setMap(null);
+		coordinates.markers.shift();
 	}
 }
 
 function AddMultipleMarkers (busNumber) {
+
 	/* Add multiple Markers */
 	for (let i = 0; i < coordinates.bus[busNumber].stop.lat.length; i++) {
 			 
@@ -203,24 +218,44 @@ function CreatePath( busNumber ) {
 	var busPath = [];
 
 	for (let index = 0; index < coordinates.bus[busNumber].lat.length; index++) {
-
 		busPath.push({lat: coordinates.bus[busNumber].lat[index],lng: coordinates.bus[busNumber].lng[index]});
-		
 	}
+
+	/* DEbug 
+	console.log(busPath);*/
 	
 	PathObject = new google.maps.Polyline({
 		path: busPath,
 		geodesic: true,
-		strokeColor: '#FF0000',
+		strokeColor: '#000000',
 		strokeOpacity: 1.0,
 		strokeWeight: 1
 	});
 
 	PathObject.setMap(map);
 
+	coordinates.path.push(PathObject);
+
 }
 
-function DeletePath() {
-	PathObject.setMap(null);
+function RemovePath() {
+
+	/* Only removes if there is some path data */
+	if (coordinates.path.length > 0) {
+
+		for(let i = 0; i < coordinates.path.length; i++) {
+			coordinates.path[i].setMap(null);
+			coordinates.path.shift();
+		}
+
+	}
 }
 
+function CleanTextValues() {
+	window.document.getElementById("lat-text").innerHTML = "";
+	window.document.getElementById("lng-text").innerHTML = "";
+	window.document.getElementById("distance-text").innerHTML = "";
+	window.document.getElementById("velocity-text").innerHTML = "";
+	window.document.getElementById("totalDist").innerHTML = "";
+	window.document.getElementById("endSimu-text").innerHTML = "";
+}
