@@ -43,6 +43,7 @@ window.onload = function () {
 	/* As Default, the Bus is the 1 */
 	var busNumber = 0;
 	var enableCenter = 0;
+	var togglevar = 0;
 
 	/* SETUP MAP */
 	this.initMap(busNumber);
@@ -50,6 +51,12 @@ window.onload = function () {
 	/* EVENTS */	
 	document.getElementById("focus").addEventListener('click', function() {
 		enableCenter = 1;
+		/* pesquisar sobre async & await */
+	});
+
+	document.getElementById("hidemarkers").addEventListener('click', function() {
+		togglevar = !togglevar;
+		togglevar ? DontShowMarkers() : ShowMarkers();
 	});
 
 	document.getElementById("startbtn").addEventListener('click', function() {
@@ -192,6 +199,18 @@ function RemoveMarkers() {
 	for(let i = 0; i < coordinates.markers.length; i++) {
 		coordinates.markers[i].setMap(null);
 		coordinates.markers.shift();
+	}
+}
+
+function DontShowMarkers() {
+	for(let i = 0; i < coordinates.markers.length; i++) {
+		coordinates.markers[i].setMap(null);
+	}
+}
+
+function ShowMarkers() {
+	for(let i = 0; i < coordinates.markers.length; i++) {
+		coordinates.markers[i].setMap(map);
 	}
 }
 
