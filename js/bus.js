@@ -33,7 +33,7 @@ var coordinates = {
 		
 	],
 	/* needed to handle all markers  and be able to delete */
-	markers: []
+	markers: [],
 };
 
 /* SETUP */
@@ -56,24 +56,12 @@ window.onload = function () {
 		busNumber = selectBus.value;
 
 		/* Remove multiple Markers */
-		for(let i = 0; i < coordinates.markers.length; i++) {
-			coordinates.markers[i].setMap(null);
-		}
+		RemoveMarkers();
 
 		/* Add multiple Markers */
-		for (let i = 0; i < coordinates.bus[busNumber].stop.lat.length; i++) {
-			 
-			stopLatLng = new google.maps.LatLng(coordinates.bus[busNumber].stop.lat[i], coordinates.bus[busNumber].stop.lng[i]);
+		AddMultipleMarkers(busNumber);
 
-			var marker = new google.maps.Marker({
-				position: stopLatLng,
-				map: map
-			});
-
-			/* Add to array 'markers' after adding marker */
-			coordinates.markers.push(marker);
-
-		 }
+		CreatePath(busNumber);
 	});	
 
 }	
@@ -187,7 +175,65 @@ function degreesToRadians(degrees) {
 	return degrees * Math.PI / 180;
 }
 
+function RemoveMarkers() {
+	for(let i = 0; i < coordinates.markers.length; i++) {
+		coordinates.markers[i].setMap(null);
+	}
+}
 
+function AddMultipleMarkers (busNumber) {
+	/* Add multiple Markers */
+	for (let i = 0; i < coordinates.bus[busNumber].stop.lat.length; i++) {
+			 
+		stopLatLng = new google.maps.LatLng(coordinates.bus[busNumber].stop.lat[i], coordinates.bus[busNumber].stop.lng[i]);
 
+		var marker = new google.maps.Marker({
+			position: stopLatLng,
+			map: map
+		});
 
+		/* Add to array 'markers' after adding marker */
+		coordinates.markers.push(marker);
+
+	 }
+}
+
+function CreatePath( busNumber ) {
+
+	busPath = [
+		{
+			lat: [41.2837096],
+			lng: [-8.41]
+		}
+	];
+
+	for (let index = 0; index < coordinates.bus[busNumber].lat.length; index++) {
+
+		busPath.push(coordinates.bus[busNumber].lat[index], coordinates.bus[busNumber].lng[index]);
+		
+	}
+
+	console.log(busPath);
+
+	var flightPathCoordinates = [
+		{
+			lat: 37.772, 
+			lng: -122.214
+		},
+		{lat: 21.291, lng: -157.821},
+		{lat: -18.142, lng: 178.431},
+		{lat: -27.467, lng: 153.027}
+	  ];
+	
+	var LineObject = new google.maps.Polyline({
+		path: busPath,
+		geodesic: true,
+		strokeColor: '#FF0000',
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+
+	LineObject.setMap(map);
+
+}
 
