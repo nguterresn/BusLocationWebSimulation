@@ -15,7 +15,7 @@
         min-height: 600px;
     }
 
-    #startbtn, #lat, #lng, #distance, #time_t, #totalDistance, #velocity, #busnumber, #head {
+    #startbtn, #lat, #lng, #distance, #time_t, #totalDistance, #velocity, #busnumber, #head, #secondhead {
         margin: 10px;;
     }
 

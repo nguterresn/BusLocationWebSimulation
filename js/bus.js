@@ -2,7 +2,13 @@
  * Bus.js
  */
 
-var map, marker, latLngMarker, index, heatmapData = [], totalDistance, heatmap, PathObject;
+/* global scope variables */
+var 	map,
+		marker, 
+		latLngMarker,  
+		heatmap, 
+		PathObject, 
+		enableCenter;
 
 var coordinates = {
 	bus: [
@@ -34,67 +40,94 @@ var coordinates = {
 	],
 	/* needed to handle all markers  and be able to delete */
 	markers: [],
-	path: []
+	path: [],
+	heatmapData: [],
 };
 
 /* SETUP */
 window.onload = function () {
 
 	/* As Default, the Bus is the 1 */
-	var busNumber = 0;
-	var enableCenter = 0;
-	var togglevar = 0;
+	var busNumber = 0,
+	toggleMarker = 0,
+	toggleLine = 0;
+
+	enableCenter = 0;
 
 	/* SETUP MAP */
-	this.initMap(busNumber);
+	initMap(busNumber);
 
 	/* EVENTS */	
+	document.getElementById("hideline").addEventListener('click', function() {
+		toggleLine = !toggleLine;
+		toggleLine ? DontShowPath() : ShowPath();
+	});
+
 	document.getElementById("focus").addEventListener('click', function() {
-		enableCenter = 1;
-		/* pesquisar sobre async & await */
+		enableCenter = !enableCenter;
 	});
 
 	document.getElementById("hidemarkers").addEventListener('click', function() {
-		togglevar = !togglevar;
-		togglevar ? DontShowMarkers() : ShowMarkers();
+		toggleMarker = !toggleMarker;
+		toggleMarker ? DontShowMarkers() : ShowMarkers();
 	});
 
 	document.getElementById("startbtn").addEventListener('click', function() {
 		StartSimulation( busNumber, enableCenter);
-		deleteHeatMap();
 	});
 
 	var selectBus = document.getElementById("busnumber");
 	selectBus.addEventListener("change", function() {
+		/* <option> value */
 		busNumber = selectBus.value;
 
-		/* Remove multiple Markers */
+		/* Deletes any kind of Heat Map */
+		deleteHeatMap(coordinates.heatmapData);
+
+		/* Removes multiples Markers */
 		RemoveMarkers();
 
 		/* Add multiple Markers */
 		AddMultipleMarkers(busNumber);
 
+		/* Removes any polylines */
 		RemovePath();
 
+		/* Creates polylines based on coordinates */
 		CreatePath(busNumber);
 	});	
 
 }	
 
-function StartSimulation( busNumber , enableCenter){
+function StartSimulation(busNumber){
 
-	index = 0, totalDistance = 0;
+	var index = 0;
+	var totalDistance = 0;
 
 	CleanTextValues();
+
+	/*Better option is to create an object an atributte the marker to a BUS object */
+	marker = new google.maps.Marker({
+		position: {lat: coordinates.bus[busNumber].lat[0], lng: coordinates.bus[busNumber].lng[0]},
+		map: map,
+		draggable: false,
+		icon: 'http://findicons.com/files/icons/1496/world_of_copland_2/32/school_bus.png',
+	});
+
+	repeatSimulation(busNumber, index, totalDistance);
 	
-	var inter = setInterval(function(){
+}
+
+function repeatSimulation(busNumber , index, totalDistance) {
+
+	var inter =  setTimeout(function(){
 
 		latLngMarker = new google.maps.LatLng(coordinates.bus[busNumber].lat[index],coordinates.bus[busNumber].lng[index]);
 
-		ChangesMarkerPos(latLngMarker, enableCenter);
+		ChangesMarkerPos(latLngMarker);
 
 		/* Inserts in last position */
-		heatmapData.push(latLngMarker);
+		coordinates.heatmapData.push(latLngMarker);
 
 		window.document.getElementById("lat-text").innerHTML = coordinates.bus[busNumber].lat[index];
 		window.document.getElementById("lng-text").innerHTML = coordinates.bus[busNumber].lng[index];
@@ -116,16 +149,22 @@ function StartSimulation( busNumber , enableCenter){
 		/* +1 position, so -1 */
 		if (index == (coordinates.bus[busNumber].lat.length)-1) {
 
-			generatesHeatMap(heatmapData);
+			generatesHeatMap(coordinates.heatmapData);
 			window.document.getElementById("totalDist").innerHTML = totalDistance.toFixed(2) + "(m)";
 			window.document.getElementById("endSimu-text").innerHTML = "<strong>End of Simulation</strong>";
-			clearInterval(inter);
+			clearTimeout(inter);
+
+		} 
+		else {
+
+			index++;
+
+			repeatSimulation( busNumber, index, totalDistance);
 
 		}
 
-		index++;
-
 	}, 1000);
+
 }
 
 function initMap( busNumber ) {
@@ -135,13 +174,6 @@ function initMap( busNumber ) {
 	map = new google.maps.Map(document.getElementById('map'), {
         center: MaplatLng,
         zoom: 18
-	});
-
-	marker = new google.maps.Marker({
-		position: MaplatLng,
-		map: map,
-		draggable: false,
-		icon: 'http://findicons.com/files/icons/1496/world_of_copland_2/32/school_bus.png',
 	});
 }
 
@@ -155,25 +187,22 @@ function generatesHeatMap (heatmapData) {
 
 }
 
-function deleteHeatMap () {
+function deleteHeatMap (heatmapData) {
 
 	/* If heatmap already exists: clears heatmap data */
 	if (typeof heatmap != "undefined") {
 		heatmap.setMap(null);
 	}
 
+	for (let index = 0; index < coordinates.heatmapData.length; index++) coordinates.heatmapData.shift();
+
 }
 
-function clearMarkers() {
-	setMapOnAll(null);
-}
+function ChangesMarkerPos (latLngMarker) {
 
-function ChangesMarkerPos (latLngMarker, enableCenter) {
 	marker.setPosition(latLngMarker);
 
-	console.log(enableCenter);
-	if (enableCenter)
-		map.setCenter(latLngMarker);
+	if (enableCenter) map.setCenter(latLngMarker);
 }
 
 function distanceInMBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
@@ -265,6 +294,29 @@ function RemovePath() {
 		for(let i = 0; i < coordinates.path.length; i++) {
 			coordinates.path[i].setMap(null);
 			coordinates.path.shift();
+		}
+
+	}
+}
+
+function ShowPath() {
+
+	if (coordinates.path.length > 0) {
+
+		for(let i = 0; i < coordinates.path.length; i++) {
+			coordinates.path[i].setMap(map);
+		}
+
+	}
+
+}
+
+function DontShowPath() {
+
+	if (coordinates.path.length > 0) {
+
+		for(let i = 0; i < coordinates.path.length; i++) {
+			coordinates.path[i].setMap(null);
 		}
 
 	}
