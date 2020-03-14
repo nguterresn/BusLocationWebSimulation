@@ -4,7 +4,6 @@
 
 /* global scope variables */
 var 	map, 
-		latLngMarker,  
 		heatmap, 
 		PathObject, 
 		enableCenter;
@@ -18,7 +17,8 @@ var coordinates = {
 				lat: [41.283795],
 				lng: [-8.568591]
 			},
-			icon: {}
+			icon: {},
+			infoWindow: {}
 		},
 		{
 			lat: [41.2837096, 41.283683, 41.283653, 41.283616, 41.283588, 41.283550, 41.283497, 41.283497, 41.283497, 41.283467, 41.283435, 41.283393, 41.283346, 41.283302, 41.283262, 41.283215, 41.283171],
@@ -27,7 +27,8 @@ var coordinates = {
 				lat: [41.283497],
 				lng: [-8.566682]
 			},
-			icon: {}
+			icon: {},
+			infoWindow: {}
 		},
 		{
 			lat: [],
@@ -119,7 +120,7 @@ function repeatSimulation(busNumber, index, totalDistance) {
 
 	var inter =  setTimeout(function(){
 
-		latLngMarker = new google.maps.LatLng(coordinates.bus[busNumber].lat[index],coordinates.bus[busNumber].lng[index]);
+		var latLngMarker = new google.maps.LatLng(coordinates.bus[busNumber].lat[index],coordinates.bus[busNumber].lng[index]);
 
 		ChangesMarkerPos(coordinates.bus[busNumber].icon, latLngMarker);
 
@@ -142,6 +143,8 @@ function repeatSimulation(busNumber, index, totalDistance) {
 				totalDistance += dist;
 			}
 		} 
+
+		UpdateInfoWindow(busNumber, coordinates.bus[busNumber].lat[index], coordinates.bus[busNumber].lng[index], dist, vel);
 
 		/* +1 position, so -1 */
 		if (index == (coordinates.bus[busNumber].lat.length)-1) {
@@ -258,7 +261,7 @@ function AddMultipleMarkers (busNumber) {
 	 }
 }
 
-function CreatePath( busNumber ) {
+function CreatePath(busNumber) {
 
 	var busPath = [];
 
@@ -335,7 +338,40 @@ function CreateIconObject (busNumber) {
 		position: {lat: coordinates.bus[busNumber].lat[0], lng: coordinates.bus[busNumber].lng[0]},
 		map: map,
 		draggable: false,
+		clickable: true,
 		icon: 'http://findicons.com/files/icons/1496/world_of_copland_2/32/school_bus.png',
 	});
+
+	attachMessage(coordinates.bus[busNumber].icon, busNumber);
+
+}
+
+function attachMessage(marker, busNumber) {
+
+	coordinates.bus[busNumber].infoWindow = new google.maps.InfoWindow({
+	  content: 	"Bus: " + busNumber 
+	});
+
+	marker.addListener('click', function() {
+		coordinates.bus[busNumber].infoWindow.open(marker.get('map'), marker);
+	});
+
+}
+
+function UpdateInfoWindow(busNumber, lat, lng, distance, velocity) {
+
+	/* ToFixed() requires a value */
+	if (typeof distance == "undefined" || typeof velocity == "undefined") {
+		distance = 0;
+		velocity = 0;
+	}
+		
+	var contentString = "<b>Bus: </b>" + busNumber + "<br>" 
+	+ "Lat: " + lat + "<br>"
+	+ "Lng: " + lng + "<br>"
+	+ "Distance: " + distance.toFixed(2) + " (m) <br>"
+	+ "Velocity: " + velocity.toFixed(2) + " (km/h) <br>"
+
+	coordinates.bus[busNumber].infoWindow.setContent(contentString);
 
 }
