@@ -3,8 +3,7 @@
  */
 
 /* global scope variables */
-var 	map,
-		marker, 
+var 	map, 
 		latLngMarker,  
 		heatmap, 
 		PathObject, 
@@ -18,7 +17,8 @@ var coordinates = {
 			stop: {
 				lat: [41.283795],
 				lng: [-8.568591]
-			}
+			},
+			icon: {}
 		},
 		{
 			lat: [41.2837096, 41.283683, 41.283653, 41.283616, 41.283588, 41.283550, 41.283497, 41.283497, 41.283497, 41.283467, 41.283435, 41.283393, 41.283346, 41.283302, 41.283262, 41.283215, 41.283171],
@@ -26,7 +26,8 @@ var coordinates = {
 			stop: {
 				lat: [41.283497],
 				lng: [-8.566682]
-			}
+			},
+			icon: {}
 		},
 		{
 			lat: [],
@@ -73,7 +74,7 @@ window.onload = function () {
 	});
 
 	document.getElementById("startbtn").addEventListener('click', function() {
-		StartSimulation( busNumber, enableCenter);
+		StartSimulation( busNumber );
 	});
 
 	var selectBus = document.getElementById("busnumber");
@@ -106,25 +107,21 @@ function StartSimulation(busNumber){
 
 	CleanTextValues();
 
-	/*Better option is to create an object an atributte the marker to a BUS object */
-	marker = new google.maps.Marker({
-		position: {lat: coordinates.bus[busNumber].lat[0], lng: coordinates.bus[busNumber].lng[0]},
-		map: map,
-		draggable: false,
-		icon: 'http://findicons.com/files/icons/1496/world_of_copland_2/32/school_bus.png',
-	});
+	/* Saves a IconObject in coordinates.bus[busnumber].icon */
+	/* In this way, it is possible to handle multiple icons per map */
+	CreateIconObject(busNumber);
 
 	repeatSimulation(busNumber, index, totalDistance);
 	
 }
 
-function repeatSimulation(busNumber , index, totalDistance) {
+function repeatSimulation(busNumber, index, totalDistance) {
 
 	var inter =  setTimeout(function(){
 
 		latLngMarker = new google.maps.LatLng(coordinates.bus[busNumber].lat[index],coordinates.bus[busNumber].lng[index]);
 
-		ChangesMarkerPos(latLngMarker);
+		ChangesMarkerPos(coordinates.bus[busNumber].icon, latLngMarker);
 
 		/* Inserts in last position */
 		coordinates.heatmapData.push(latLngMarker);
@@ -198,9 +195,9 @@ function deleteHeatMap (heatmapData) {
 
 }
 
-function ChangesMarkerPos (latLngMarker) {
+function ChangesMarkerPos (iconObject, latLngMarker) {
 
-	marker.setPosition(latLngMarker);
+	iconObject.setPosition(latLngMarker);
 
 	if (enableCenter) map.setCenter(latLngMarker);
 }
@@ -329,4 +326,16 @@ function CleanTextValues() {
 	window.document.getElementById("velocity-text").innerHTML = "";
 	window.document.getElementById("totalDist").innerHTML = "";
 	window.document.getElementById("endSimu-text").innerHTML = "";
+}
+
+function CreateIconObject (busNumber) {
+
+	/* Better option is to create an object and atributte the marker to a BUS object */
+	coordinates.bus[busNumber].icon = new google.maps.Marker({
+		position: {lat: coordinates.bus[busNumber].lat[0], lng: coordinates.bus[busNumber].lng[0]},
+		map: map,
+		draggable: false,
+		icon: 'http://findicons.com/files/icons/1496/world_of_copland_2/32/school_bus.png',
+	});
+
 }
