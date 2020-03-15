@@ -53,7 +53,8 @@ window.onload = function () {
 	var busNumber = 0,
 	toggleMarker = 0,
 	toggleLine = 0,
-	toggleDetails = 0;
+	toggleDetails = 0,
+	toggleDebug = 1;
 
 	enableCenter = 0;
 
@@ -80,6 +81,15 @@ window.onload = function () {
 		toggleDetails ? document.getElementById("details").style.visibility = "hidden" : document.getElementById("details").style.visibility = "visible";
 	});
 
+	document.getElementById("hidedebug").addEventListener('click', function() {
+		toggleDebug = !toggleDebug;
+		try {
+			toggleDebug ? document.getElementById("debug").style.visibility = "hidden" : document.getElementById("debug").style.visibility = "visible";
+		} catch (e) {
+			console.error(e);
+		}
+	});
+
 	document.getElementById("startbtn").addEventListener('click', function() {
 		StartSimulation( busNumber );
 	});
@@ -88,6 +98,7 @@ window.onload = function () {
 	selectBus.addEventListener("change", function() {
 		/* <option> value */
 		busNumber = selectBus.value;
+
 
 		/* Deletes any kind of Heat Map */
 		deleteHeatMap(coordinates.heatmapData);
@@ -103,6 +114,7 @@ window.onload = function () {
 
 		/* Creates polylines based on coordinates */
 		CreatePath(busNumber);
+
 	});	
 
 }	
@@ -117,6 +129,9 @@ function StartSimulation(busNumber){
 	/* Saves a IconObject in coordinates.bus[busnumber].icon */
 	/* In this way, it is possible to handle multiple icons per map */
 	CreateIconObject(busNumber);
+
+	/* Deletes any kind of Heat Map */
+	deleteHeatMap(coordinates.heatmapData);
 
 	repeatSimulation(busNumber, index, totalDistance);
 	
@@ -179,7 +194,7 @@ function initMap( busNumber ) {
 
 	map = new google.maps.Map(document.getElementById('map'), {
         center: MaplatLng,
-        zoom: 18
+        zoom: 17
 	});
 }
 
@@ -200,7 +215,9 @@ function deleteHeatMap (heatmapData) {
 		heatmap.setMap(null);
 	}
 
-	for (let index = 0; index < coordinates.heatmapData.length; index++) coordinates.heatmapData.shift();
+	debugValue(heatmap);
+
+	for (let index = 0; index < coordinates.heatmapData.length; index++) coordinates.heatmapData.pop();
 
 }
 
@@ -208,7 +225,7 @@ function ChangesMarkerPos (iconObject, latLngMarker) {
 
 	iconObject.setPosition(latLngMarker);
 
-	if (enableCenter) map.setCenter(latLngMarker);
+	if (enableCenter) map.panTo(latLngMarker);
 }
 
 function distanceInMBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
@@ -251,44 +268,53 @@ function ShowMarkers() {
 
 function AddMultipleMarkers (busNumber) {
 
-	/* Add multiple Markers */
-	for (let i = 0; i < coordinates.bus[busNumber].stop.lat.length; i++) {
-			 
-		stopLatLng = new google.maps.LatLng(coordinates.bus[busNumber].stop.lat[i], coordinates.bus[busNumber].stop.lng[i]);
+	/* Check is busnumber is a number, otherwise is not valid */
+	if (!isNaN(busNumber)) {
 
-		var marker = new google.maps.Marker({
-			position: stopLatLng,
-			map: map
-		});
+		/* Add multiple Markers */
+		for (let i = 0; i < coordinates.bus[busNumber].stop.lat.length; i++) {
+				
+			stopLatLng = new google.maps.LatLng(coordinates.bus[busNumber].stop.lat[i], coordinates.bus[busNumber].stop.lng[i]);
 
-		/* Add to array 'markers' after adding marker */
-		coordinates.markers.push(marker);
+			var marker = new google.maps.Marker({
+				position: stopLatLng,
+				map: map
+			});
 
-	 }
+			/* Add to array 'markers' after adding marker */
+			coordinates.markers.push(marker);
+
+		}
+
+	}
 }
 
 function CreatePath(busNumber) {
 
-	var busPath = [];
+	/* Check is busnumber is a number, otherwise is not valid */
+	if (!isNaN(busNumber)) {
 
-	for (let index = 0; index < coordinates.bus[busNumber].lat.length; index++) {
-		busPath.push({lat: coordinates.bus[busNumber].lat[index],lng: coordinates.bus[busNumber].lng[index]});
+		var busPath = [];
+
+		for (let index = 0; index < coordinates.bus[busNumber].lat.length; index++) {
+			busPath.push({lat: coordinates.bus[busNumber].lat[index],lng: coordinates.bus[busNumber].lng[index]});
+		}
+
+		/* DEbug 
+		console.log(busPath);*/
+		
+		PathObject = new google.maps.Polyline({
+			path: busPath,
+			geodesic: true,
+			strokeColor: '#000000',
+			strokeOpacity: 1.0,
+			strokeWeight: 1
+		});
+
+		PathObject.setMap(map);
+
+		coordinates.path.push(PathObject);
 	}
-
-	/* DEbug 
-	console.log(busPath);*/
-	
-	PathObject = new google.maps.Polyline({
-		path: busPath,
-		geodesic: true,
-		strokeColor: '#000000',
-		strokeOpacity: 1.0,
-		strokeWeight: 1
-	});
-
-	PathObject.setMap(map);
-
-	coordinates.path.push(PathObject);
 
 }
 
@@ -350,6 +376,12 @@ function CreateIconObject (busNumber) {
 
 	attachMessage(coordinates.bus[busNumber].icon, busNumber);
 
+	/* Create event that follows marker and zooms in */
+	coordinates.bus[busNumber].icon.addListener('click', function() {
+		map.setCenter(coordinates.bus[busNumber].icon.position);
+		map.setZoom(18);
+	});
+
 }
 
 function attachMessage(marker, busNumber) {
@@ -380,4 +412,8 @@ function UpdateInfoWindow(busNumber, lat, lng, distance, velocity) {
 
 	coordinates.bus[busNumber].infoWindow.setContent(contentString);
 
+}
+
+function debugValue(parameter) {
+	document.getElementById("debug-text").innerHTML = parameter;
 }

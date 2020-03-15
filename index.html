@@ -33,8 +33,8 @@
                 <div class="col simu rounded">
 
                     <div class="row">
-                            <select class="select-css" name="busnumber" id="busnumber">
-                                <option value="none" selected></option>
+                            <select class="select-css" name="busnumber" id="busnumber" >
+                                <option value="none" selected="selected"></option>
                                 <option value="0">Bus1</option>
                                 <option value="1">Bus2</option>
                                 <option value="2">Bus3</option>
@@ -56,6 +56,10 @@
 
                     <div class="row btnStyle">
                         <button class="btn btn-dark btn-sm btn-block" id="hidedetails">Show/Hide Details</button>
+                    </div>
+
+                    <div class="row btnStyle">
+                        <button class="btn btn-dark btn-sm btn-block" id="hidedebug">Show/Hide Debug Message</button>
                     </div>
 
                     <div class="row btnStyle">
@@ -98,6 +102,10 @@
                     <p class="text-center"><strong>Total Distance</strong></p>
                     <p class="text-center" id="totalDist"></p>
                 </div>
+            </div>
+
+            <div class="row debug" id="debug">
+              <p> Show <strong>console.log():</strong> <small id="debug-text"></small> </p>
             </div>
 
         </div>
