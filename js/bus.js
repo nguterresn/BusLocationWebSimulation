@@ -52,7 +52,8 @@ window.onload = function () {
 	/* As Default, the Bus is the 1 */
 	var busNumber = 0,
 	toggleMarker = 0,
-	toggleLine = 0;
+	toggleLine = 0,
+	toggleDetails = 0;
 
 	enableCenter = 0;
 
@@ -72,6 +73,11 @@ window.onload = function () {
 	document.getElementById("hidemarkers").addEventListener('click', function() {
 		toggleMarker = !toggleMarker;
 		toggleMarker ? DontShowMarkers() : ShowMarkers();
+	});
+
+	document.getElementById("hidedetails").addEventListener('click', function() {
+		toggleDetails = !toggleDetails;
+		toggleDetails ? document.getElementById("details").style.visibility = "hidden" : document.getElementById("details").style.visibility = "visible";
 	});
 
 	document.getElementById("startbtn").addEventListener('click', function() {

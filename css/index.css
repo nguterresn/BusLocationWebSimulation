@@ -1,27 +1,70 @@
 /* mudar para 768px */
 
+    :root {
+        --main-box-color: white;
+        --main-bg-color: #2e3131;
+    }
+
     h2 {
         text-align: center;
+        color: white;
+    }
+
+    p {
+        color: black;
     }
 
     body {
         height: 100vh;
         width: 100vw;
+        /*background-color: #2e3131;*/
+        background-color: var(--main-bg-color);
+    }
+
+    /* Buttons content layer */
+    .simu {
+        max-height: fit-content;
+        margin-left: 1%;
+        background-color: var(--main-box-color);
+        box-shadow: 0px 0px 5px 5px;
+        /* pos pos opacity spread */
+
+    }
+
+    /* MAp content layer */
+    .map {
+        border-radius: 10px;
+        margin-right: 1%;
+        height: 600px;
+        box-shadow: 0px 0px 5px 5px;
+    }
+
+    /* Details content layer */
+    .details {
+        height: 100px;
         background-color: white;
+        border-radius: 10px;
+        margin-top: 2%;
+        box-shadow: 0px 0px 5px 5px;
+        /*box-shadow: 0px 0px 5px 10px;*/
     }
 
-    .col.simu{
-        border: 2px solid black;
-        min-height: 600px;
-    }
-
-    #startbtn, #lat, #lng, #distance, #time_t, #totalDistance, #velocity, #busnumber, #head, #secondhead {
+    #lat, #lng, #distance, #totalDistance, #velocity {
         margin: 10px;;
     }
 
     #busnumber {
         /* better looking */
-        width: 80%;
+        width: 100%;
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-bottom: 10%;
+        margin-top: 10%;
+    }
+
+    .btnStyle {
+        margin: auto;
+        margin-bottom: 5%;
     }
 
 

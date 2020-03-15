@@ -27,91 +27,38 @@
 
             <div class="row">
 
-                <div class="col-8" id="map"></div>
+                <div class="col-9 map" id="map"></div>
     
-                <div class="col simu">
+                <div class="col simu rounded">
 
-                    <div class="row" id="head">
-                        <div class="col">
+                    <div class="row">
                             <select name="busnumber" id="busnumber">
-                                <option value="0" selected>Bus1</option>
+                                <option value="none" selected></option>
+                                <option value="0">Bus1</option>
                                 <option value="1">Bus2</option>
                                 <option value="2">Bus3</option>
                                 <option value="all">All</option>
                             </select>
-                        </div>
-                        <div class="col">
-                            <button class="btn btn-primary btn-sm" id="focus">Focus</button>
-                        </div>
                     </div>
 
-                    <div class="row" id="secondhead">
-                        <div class="col">
-                            <button class="btn btn-primary btn-sm" id="hidemarkers">Hide Markers</button>
-                        </div>
-                        <div class="col">
-                            <button class="btn btn-primary btn-sm" id="hideline">Hide Lines</button>
-                        </div>
-                    </div>
-                    
-                    <div class="row" id="lat">
-                        <div class="col">
-                            <p class="text-left"><strong>Latitude:</strong></p>
-                        </div>
-                        <div class="col">
-                            <p class="" id="lat-text"> </p>
-                        </div>
-                    </div>
-                    
-                    <div class="row" id="lng">
-                        <div class="col">
-                            <p class="text-left"><strong>Longitude: </strong> </p>
-                        </div>
-                        <div class="col">
-                            <p class="text-left" id="lng-text"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row" id="distance">
-
-                        <div class="col">
-                            <p class="text-left"><strong>Distance: </strong></p>
-                        </div>
-                        <div class="col">
-                            <p class="text-left" id="distance-text"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row" id="velocity">
-
-                        <div class="col">
-                            <p class="text-left"><strong>Velocity: </strong></p>
-                        </div>
-                        <div class="col">
-                            <p class="text-left" id="velocity-text"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row" id="time_t">
-                        <div class="col">
-                            <p class="text-left"><strong>Time: </strong></p>
-                        </div>
-                        <div class="col">
-                            <p class="text-left" id="time_t-text"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row" id="totalDistance">
-                        <div class="col">
-                            <p class="text-left"><strong>Total Distance:</strong></p>
-                        </div>
-                        <div class="col">
-                            <p class="text-left" id="totalDist"></p>
-                        </div>
+                    <div class="row btnStyle">
+                        <button class="btn btn-dark btn-sm btn-block" id="focus">Focus</button>
                     </div>
 
-                    <div class="row justify-content-center">
-                        <button class="btn btn-success" id="startbtn">Start Simulation</button>
+                    <div class="row btnStyle">
+                            <button class="btn btn-dark btn-sm btn-block" id="hidemarkers">Show/Hide Markers</button>
+                    </div>
+
+                    <div class="row btnStyle">
+                        <button class="btn btn-dark btn-sm btn-block" id="hideline">Show/Hide Lines</button>
+                    </div>
+
+                    <div class="row btnStyle">
+                        <button class="btn btn-dark btn-sm btn-block" id="hidedetails">Show/Hide Details</button>
+                    </div>
+
+                    <div class="row btnStyle">
+                        <button class="btn btn-success btn-lg btn-block" id="startbtn">Start Simulation</button>
                     </div>
                     
                     <div class="row" id="endSimu">
@@ -123,6 +70,33 @@
     
                 </div>
 
+            </div>
+
+            <div class="row details" id="details">
+                <div class="col" id="lat">
+                    <p class="text-center"><strong>Latitude</strong></p>
+                    <p class="text-center" id="lat-text"> </p>
+                </div>
+
+                <div class="col" id="lng">
+                    <p class="text-center"><strong>Longitude</strong> </p>
+                    <p class="text-center" id="lng-text"></p>
+                </div>
+
+                <div class="col" id="distance">
+                    <p class="text-center"><strong>Distance</strong></p>
+                    <p class="text-center" id="distance-text"></p>
+                </div>
+
+                <div class="col" id="velocity">
+                    <p class="text-center"><strong>Velocity</strong></p>
+                    <p class="text-center" id="velocity-text"></p>
+                </div>
+
+                <div class="col" id="totalDistance">
+                    <p class="text-center"><strong>Total Distance</strong></p>
+                    <p class="text-center" id="totalDist"></p>
+                </div>
             </div>
 
         </div>
